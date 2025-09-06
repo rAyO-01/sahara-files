@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 import SearchPanel from "./Components/SearchPanel";
 import { Routes, Route, NavLink } from "react-router-dom";
-import { FaCog, FaBook, FaFolderOpen, FaThLarge, FaDownload } from "react-icons/fa";
+import { FaCog, FaBook, FaFolderOpen, FaThLarge, FaDownload, FaFileAlt, FaFileArchive, FaFilePdf } from "react-icons/fa";
 
 // GitHub repo details
 const REPO_OWNER = "rAyO-01";
@@ -114,56 +114,40 @@ function Manuals() {
     fetchGitHubFiles(MANUALS_FOLDER).then(setManuals);
   }, []);
 
-  return (<div>
+  const getFileIcon = (fileName) => {
+    if (fileName.endsWith(".pdf")) return <FaFilePdf color="#E74C3C" size={24} />;
+    if (fileName.endsWith(".zip")) return <FaFileArchive color="#F1C40F" size={24} />;
+    if (fileName.endsWith(".docx")) return <FaFileAlt color="#3498DB" size={24} />;
+    return <FaFileAlt size={24} />;
+  };
+
+  return (
+    <div>
       <h2>Manuals</h2>
       {manuals.length === 0 && <p>No manuals found yet.</p>}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(2, 1fr)",
-          gap: "20px",
-        }}
-      >
+      <div className="items-grid">
         {manuals.map((manual, index) => (
-          <div
-            key={index}
-            style={{
-              border: "1px solid #ccc",
-              borderRadius: "8px",
-              padding: "10px",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-              background: "#fff",
-            }}
-          >
-            <h3 style={{ fontSize: "16px", marginBottom: "8px" }}>
-              {manual.name}
-            </h3>
+          <div key={index} className="item-card">
+            <div className="item-icon">{getFileIcon(manual.name)}</div>
+            <h3>{manual.name.replace(/_/g, " ").replace(/\.[^/.]+$/, "")}</h3>
 
-            <div
-              style={{
-                height: "250px",
-                overflow: "auto",
-                marginBottom: "10px",
-              }}
-            >
+            {/* PDF preview */}
+            {manual.name.endsWith(".pdf") && (
               <iframe
                 src={manual.url}
-                width="100%"
-                height="100%"
-                style={{ border: "none", borderRadius: "4px" }}
                 title={manual.name}
-              />
-            </div>
+                className="pdf-preview"
+              ></iframe>
+            )}
 
-            <a href={manual.url} download>
-              <button
-                className="download-btn"
-                style={{ width: "100%", textAlign: "center" }}
-              >
-                <FaDownload style={{ marginRight: "5px" }} />
-                Download
-              </button>
-            </a>
+            <div className="item-actions">
+              <a href={manual.url} target="_blank" rel="noopener noreferrer" className="open-button">
+                Open
+              </a>
+              <a href={manual.url} download className="download-button">
+                <FaDownload style={{ marginRight: "5px" }} /> Download
+              </a>
+            </div>
           </div>
         ))}
       </div>
